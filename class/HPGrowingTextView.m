@@ -237,7 +237,10 @@
 
 - (void)refreshHeight
 {
-	//size of content, so we can set the frame of self
+	// size of content, so we can set the frame of self
+    // We use the contentInset of the internal text view to adjust the height. A negative inset
+    // on the internal view should make this view smaller, and a positive inset should make this
+    // view larger.
 	NSInteger newSizeH = internalTextView.contentSize.height + internalTextView.contentInset.top + internalTextView.contentInset.bottom;
 	if(newSizeH < minHeight || !internalTextView.hasText) newSizeH = minHeight; //not smalles than minHeight
   if (internalTextView.frame.size.height > maxHeight) newSizeH = maxHeight; // not taller than maxHeight
