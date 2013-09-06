@@ -32,6 +32,7 @@
 -(void)commonInitialiser;
 -(void)resizeTextView:(NSInteger)newSizeH;
 -(void)growDidStop;
+-(CGFloat)measureHeight;
 @end
 
 @implementation HPGrowingTextView
@@ -151,7 +152,7 @@
     
     internalTextView.text = newText;
     
-    maxHeight = internalTextView.contentSize.height;
+    maxHeight = [self measureHeight];
     
     internalTextView.text = saveText;
     internalTextView.hidden = NO;
@@ -188,7 +189,7 @@
     
     internalTextView.text = newText;
     
-    minHeight = internalTextView.contentSize.height;
+    minHeight = [self measureHeight];
     
     internalTextView.text = saveText;
     internalTextView.hidden = NO;
@@ -241,7 +242,7 @@
     // We use the contentInset of the internal text view to adjust the height. A negative inset
     // on the internal view should make this view smaller, and a positive inset should make this
     // view larger.
-	NSInteger newSizeH = internalTextView.contentSize.height + internalTextView.contentInset.top + internalTextView.contentInset.bottom;
+	NSInteger newSizeH = [self measureHeight] + internalTextView.contentInset.top + internalTextView.contentInset.bottom;
 	if(newSizeH < minHeight || !internalTextView.hasText) newSizeH = minHeight; //not smalles than minHeight
   if (internalTextView.frame.size.height > maxHeight) newSizeH = maxHeight; // not taller than maxHeight
 
@@ -595,6 +596,34 @@
 	}
 }
 
+- (CGFloat)measureHeight
+{
+    if ([self respondsToSelector:@selector(snapshotViewAfterScreenUpdates:)])
+    {
+        CGRect frame = internalTextView.bounds;
+        CGSize fudgeFactor;
+        // The padding added around the text on iOS6 and iOS7 is different.
+        if ([self respondsToSelector:@selector(snapshotViewAfterScreenUpdates:)]) {
+            fudgeFactor = CGSizeMake(10.0, 16.0);
+        } else {
+            fudgeFactor = CGSizeMake(16.0, 16.0);
+        }
+        frame.size.height -= fudgeFactor.height;
+        frame.size.width -= fudgeFactor.width;
+        
+        NSDictionary *attributes = @{NSFontAttributeName: internalTextView.font};
+        CGRect size = [internalTextView.text boundingRectWithSize:CGSizeMake(CGRectGetWidth(frame), MAXFLOAT)
+                                         options:NSStringDrawingUsesLineFragmentOrigin
+                                      attributes:attributes
+                                         context:nil];
+        
+        return CGRectGetHeight(size) + fudgeFactor.height;
+    }
+    else
+    {
+        return self.internalTextView.contentSize.height;
+    }
+}
 
 
 @end
