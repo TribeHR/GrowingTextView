@@ -611,11 +611,17 @@
         frame.size.height -= fudgeFactor.height;
         frame.size.width -= fudgeFactor.width;
         
+        NSString *textToMeasure = internalTextView.text;
+        if ([textToMeasure hasSuffix:@"\n"])
+        {
+            textToMeasure = [NSString stringWithFormat:@"%@-",internalTextView.text];
+        }
+        
         NSDictionary *attributes = @{NSFontAttributeName: internalTextView.font};
-        CGRect size = [internalTextView.text boundingRectWithSize:CGSizeMake(CGRectGetWidth(frame), MAXFLOAT)
-                                         options:NSStringDrawingUsesLineFragmentOrigin
-                                      attributes:attributes
-                                         context:nil];
+        CGRect size = [textToMeasure boundingRectWithSize:CGSizeMake(CGRectGetWidth(frame), MAXFLOAT)
+                                                  options:NSStringDrawingUsesLineFragmentOrigin
+                                               attributes:attributes
+                                                  context:nil];
         
         return CGRectGetHeight(size) + fudgeFactor.height;
     }
@@ -624,6 +630,5 @@
         return self.internalTextView.contentSize.height;
     }
 }
-
 
 @end
