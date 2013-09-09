@@ -596,6 +596,10 @@
 	}
 }
 
+// This solves a bug where the text field would not grow or shrink on iOS 7.
+// See https://devforums.apple.com/message/872638#872638 for details, or check
+// the commit message. Hopefully this gets merged into origin once the NDA lifts
+// and we can use that instead of our own copy of this.
 - (CGFloat)measureHeight
 {
     if ([self respondsToSelector:@selector(snapshotViewAfterScreenUpdates:)])
